@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shop_app/api/utils.dart';
 import 'package:shop_app/components/default_button.dart';
 
 import '../../../constants.dart';
@@ -12,6 +16,7 @@ class CheckoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Timer _timer;
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: getProportionateScreenWidth(15),
@@ -42,12 +47,12 @@ class CheckoutCard extends StatelessWidget {
               children: [
                 Text.rich(
                   TextSpan(
-                    text: "Total:\n",
+                    //text: "Total:\n",
                     children: [
-                      TextSpan(
-                        text: "\$337.15",
+                      /* TextSpan(
+                        text: "Rs 337.15",
                         style: TextStyle(fontSize: 16, color: Colors.black),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -55,7 +60,19 @@ class CheckoutCard extends StatelessWidget {
                   width: getProportionateScreenWidth(190),
                   child: DefaultButton(
                     text: "Check Out",
-                    press: () {},
+                    press: () async {
+                      var response = await Utils().checkout();
+                      if (response['status'] == true) {
+                        _timer?.cancel();
+                        await EasyLoading.showSuccess(response['message'] +
+                            "\n" +
+                            'order_status: ' +
+                            response['data']['order_status']);
+                      } else {
+                        _timer?.cancel();
+                        await EasyLoading.showSuccess(response['message']);
+                      }
+                    },
                   ),
                 ),
               ],

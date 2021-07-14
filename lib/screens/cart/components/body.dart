@@ -61,9 +61,8 @@ class _BodyState extends State<Body> {
             );
           }
           return Center(
-            child: CircularProgressIndicator(
-              valueColor: new AlwaysStoppedAnimation<Color>(Colors.orange),
-            ),
+            child: Text('Cart is Empty'), //CircularProgressIndicator(
+            //   valueColor: new AlwaysStoppedAnimation<Color>(Colors.orange),
           );
         },
       ),

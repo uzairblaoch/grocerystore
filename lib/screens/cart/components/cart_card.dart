@@ -20,7 +20,7 @@ class _CartCardState extends State<CartCard> {
   totalProductPrice() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('totalPrice', widget.price);
-   // print(widget.price);
+    print(widget.price);
   }
 
   @override
@@ -59,7 +59,7 @@ class _CartCardState extends State<CartCard> {
             SizedBox(height: 10),
             Text.rich(
               TextSpan(
-                text: "\$${widget.price}",
+                text: "Rs ${widget.price}",
                 style: TextStyle(
                     fontWeight: FontWeight.w600, color: kPrimaryColor),
                 children: [

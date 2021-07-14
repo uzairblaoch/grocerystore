@@ -29,6 +29,7 @@ const String kFirstNameNullError = "Please Enter your first name ";
 const String kLastNameNullError = "Please Enter your last name";
 const String kNAmeNullError = "Please Enter your name";
 const String kEmailNullError = "Please Enter your email";
+const String kPhoneNullError = "Please Enter your phone";
 const String kStreetlNullError = "Please Enter your street";
 const String kCityNullError = "Please Enter your city";
 const String kStateNullError = "Please Enter your state";
