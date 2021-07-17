@@ -35,7 +35,7 @@ class _HomeHeaderState extends State<HomeHeader> {
           SearchField(),
           IconBtnWithCounter(
             svgSrc: "assets/icons/Cart Icon.svg",
-            numOfitem: totalItems,
+            numOfitem: 3,
             press: () => Navigator.pushNamed(context, CartScreen.routeName),
           ),
           /*IconBtnWithCounter(
