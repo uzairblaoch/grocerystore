@@ -17,7 +17,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    Utils().viewCart();
+    //Utils().viewCart();
     gettotalItems();
   }
 
@@ -34,26 +34,51 @@ class _BodyState extends State<Body> {
           if (snapshot.hasData) {
             // print(snapshot.data.data.products.length);
             totalItems = snapshot.data.data.products.length;
+            print("---------------checking---------------------");
             print(totalItems);
+            print("---------------checking---------------------");
             return ListView.builder(
               itemCount: snapshot.data.data.products.length,
               itemBuilder: (BuildContext context, index) => Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Dismissible(
                   key:
-                      UniqueKey() /*Key(snapshot.data.data.products[index].pivot.productId
-                      .toString())*/
+                      UniqueKey() /*Key(snapshot
+                              .data.data.products[index].pivot.productId)*/
                   , //demoCarts[index].product.id.toString()
                   direction: DismissDirection.endToStart,
-                  onDismissed: (direction) {
-                    setState(() {
+                  /* confirmDismiss: (DismissDirection direction) async {
+                    return await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirm"),
+                          content: const Text(
+                              "Are you sure you wish to delete this item?"),
+                          actions: <Widget>[
+                            FlatButton(
+                                onPressed: () =>
+                                    Navigator.of(context).pop(true),
+                                child: const Text("DELETE")),
+                            FlatButton(
+                              onPressed: () => Navigator.of(context).pop(false),
+                              child: const Text("CANCEL"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },*/
+                  onDismissed: (direction) async {
+                    await Utils().removeCart(snapshot
+                        .data.data.products[index].pivot.productId
+                        .toString());
+                    /* setState(() async {
                       print(direction);
-                      Utils().removeCart(snapshot
-                          .data.data.products[index].pivot.productId
-                          .toString());
-                      Utils().viewCart();
+
+                      // await Utils().viewCart();
                       // ViewCart.removeAt(index);
-                    });
+                    });*/
                   },
                   background: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20),
