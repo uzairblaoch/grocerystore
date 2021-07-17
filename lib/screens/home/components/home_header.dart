@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shop_app/screens/cart/cart_screen.dart';
 
 import '../../../size_config.dart';
@@ -15,6 +16,14 @@ class HomeHeader extends StatefulWidget {
 }
 
 class _HomeHeaderState extends State<HomeHeader> {
+  var totalItems;
+
+  @override
+  void initState() {
+    super.initState();
+    totalItems = gettotalItems();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -26,15 +35,22 @@ class _HomeHeaderState extends State<HomeHeader> {
           SearchField(),
           IconBtnWithCounter(
             svgSrc: "assets/icons/Cart Icon.svg",
+            numOfitem: totalItems,
             press: () => Navigator.pushNamed(context, CartScreen.routeName),
           ),
           /*IconBtnWithCounter(
             svgSrc: "assets/icons/Bell.svg",
-            numOfitem: 3,
+            numOfitem: totalItems,
             press: () {},
           ),*/
         ],
       ),
     );
+  }
+
+  gettotalItems() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var totalItems = prefs.getInt('totalItems');
+    return totalItems;
   }
 }

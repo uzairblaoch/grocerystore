@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shop_app/api/utils.dart';
 import 'package:shop_app/components/custom_surfix_icon.dart';
 import 'package:shop_app/components/default_button.dart';
 import 'package:shop_app/components/form_error.dart';
@@ -16,20 +19,24 @@ class AccountForm extends StatefulWidget {
 }
 
 class _AccountFormState extends State<AccountForm> {
+  Timer _timer;
   final _formKey = GlobalKey<FormState>();
   String firstName;
   String lastName;
   String email;
+  String password;
+  String conform_password;
   String phone;
   bool remember = false;
-  final first_name = TextEditingController();
-  final last_name = TextEditingController();
+  final _first_name = TextEditingController();
+  final _last_name = TextEditingController();
   final _email = TextEditingController();
   final _phone = TextEditingController();
-
+  final _password = TextEditingController();
+  final _confirmPassword = TextEditingController();
   final List<String> errors = [];
   final ImagePicker _picker = ImagePicker();
-  File _imageFile;
+  var imagePath = null;
   void addError({String error}) {
     if (!errors.contains(error))
       setState(() {
@@ -51,19 +58,16 @@ class _AccountFormState extends State<AccountForm> {
       child: Column(
         children: [
           SizedBox(
-            height: 115,
-            width: 115,
+            height: 50,
+            width: 50,
             child: Stack(
               fit: StackFit.expand,
               overflow: Overflow.visible,
               children: [
-                CircleAvatar(
-                  backgroundImage:
-                      AssetImage("assets/images/Profile Image.png"),
-                ),
-                Positioned(
-                  right: -16,
-                  bottom: 0,
+                /*CircleAvatar(
+                  backgroundImage: AssetImage("assets/icons/Camera Icon.svg"),
+                ),*/
+                Center(
                   child: SizedBox(
                     height: 46,
                     width: 46,
@@ -73,11 +77,12 @@ class _AccountFormState extends State<AccountForm> {
                         side: BorderSide(color: Colors.white),
                       ),
                       color: Color(0xFFF5F6F9),
-                      onPressed: () {
-                        var pickedFile =
-                            _picker.getImage(source: ImageSource.gallery);
-                       // Image.file(pickedFile);
-                        print(pickedFile);
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        var image =
+                            await picker.getImage(source: ImageSource.gallery);
+                        imagePath = image.path;
+                        //  print(image.path);
                       },
                       child: SvgPicture.asset("assets/icons/Camera Icon.svg"),
                     ),
@@ -86,6 +91,7 @@ class _AccountFormState extends State<AccountForm> {
               ],
             ),
           ),
+          Text('Upload picture'),
           SizedBox(height: getProportionateScreenHeight(30)),
           buildFirstNameFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
@@ -95,16 +101,40 @@ class _AccountFormState extends State<AccountForm> {
           SizedBox(height: getProportionateScreenHeight(30)),
           buildPhoneFormField(),
           SizedBox(height: getProportionateScreenHeight(30)),
+          buildPasswordFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
+          buildConformPassFormField(),
+          SizedBox(height: getProportionateScreenHeight(30)),
           FormError(errors: errors),
           SizedBox(height: getProportionateScreenHeight(40)),
           DefaultButton(
-            text: "Continue",
-            press: () {
+            text: "Update",
+            press: () async {
               if (_formKey.currentState.validate()) {
-                print(first_name);
-                print(last_name);
+                print(imagePath);
+                print(_first_name);
+                print(_last_name);
                 print(_email);
+                print(_phone);
+                print(_password);
+                print(_confirmPassword);
                 _formKey.currentState.save();
+                var response = Utils().updateProfile(
+                    _first_name.text,
+                    _last_name.text,
+                    _email.text,
+                    imagePath,
+                    _password.text,
+                    _confirmPassword.text,
+                    _phone.text);
+                print(response.toString());
+                if (response['message'] == "Success") {
+                  _timer?.cancel();
+                  await EasyLoading.showSuccess(response['message']);
+                } else {
+                  _timer?.cancel();
+                  await EasyLoading.showError(response['message']);
+                }
                 // if all are valid then go to success screen
                 Navigator.pop(context);
               }
@@ -202,7 +232,7 @@ class _AccountFormState extends State<AccountForm> {
         // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
-      controller: first_name,
+      controller: _first_name,
     );
   }
 
@@ -230,7 +260,75 @@ class _AccountFormState extends State<AccountForm> {
         // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
-      controller: last_name,
+      controller: _last_name,
+    );
+  }
+
+  TextFormField buildConformPassFormField() {
+    return TextFormField(
+      obscureText: true,
+      onSaved: (newValue) => conform_password = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kPassNullError);
+        } else if (value.isNotEmpty && password == conform_password) {
+          removeError(error: kMatchPassError);
+        }
+        conform_password = value;
+      },
+      validator: (value) {
+        if (value.isEmpty) {
+          addError(error: kPassNullError);
+          return "";
+        } else if ((password != value)) {
+          addError(error: kMatchPassError);
+          return "";
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: "Confirm Password",
+        hintText: "Re-enter your password",
+        // If  you are using latest version of flutter then lable text and hint text shown like this
+        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+      ),
+      controller: _confirmPassword,
+    );
+  }
+
+  TextFormField buildPasswordFormField() {
+    return TextFormField(
+      obscureText: true,
+      onSaved: (newValue) => password = newValue,
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          removeError(error: kPassNullError);
+        } else if (value.length >= 8) {
+          removeError(error: kShortPassError);
+        }
+        password = value;
+      },
+      validator: (value) {
+        if (value.isEmpty) {
+          addError(error: kPassNullError);
+          return "";
+        } else if (value.length < 8) {
+          addError(error: kShortPassError);
+          return "";
+        }
+        return null;
+      },
+      decoration: InputDecoration(
+        labelText: "Password",
+        hintText: "Enter your password",
+        // If  you are using latest version of flutter then lable text and hint text shown like this
+        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: CustomSurffixIcon(svgIcon: "assets/icons/Lock.svg"),
+      ),
+      controller: _password,
     );
   }
 }

@@ -284,11 +284,52 @@ class Utils {
     return ViewCart.fromJson(jsonDecode(response.body));
   }
 
+  Future<ViewCart> removeCart(String productId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var url = Uri.http(baseUrl, '/api/removeFromCart', {"q": "dart"});
+    final response = await http.post(url, body: {
+      "product_id": productId.toString(),
+    }, headers: {
+      'Authorization': 'Bearer $token',
+    });
+    return ViewCart.fromJson(jsonDecode(response.body));
+  }
+
   checkout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
     var url = Uri.http(baseUrl, '/api/checkout', {"q": "dart"});
     final response = await http.post(url, headers: {
+      'Authorization': 'Bearer $token',
+    });
+    if (response.statusCode == 200) {
+      final String responseString = response.body;
+      return jsonDecode(responseString);
+    } else if (response.statusCode == 500) {
+      final String responseString = response.body;
+      return jsonDecode(responseString);
+    } else {
+      final String responseString = response.body;
+      return jsonDecode(responseString);
+    }
+  }
+
+  updateProfile(String first_name, String last_name, String email, String image,
+      String password, String confirm_password, String phone) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var id = prefs.getInt('id');
+    var token = prefs.getString('token');
+    var url = Uri.http(baseUrl, '/api/update/$id', {"q": "dart"});
+    final response = await http.post(url, body: {
+      "first_name": first_name,
+      "last_name": last_name,
+      "email": email,
+      "image": image,
+      "password": password,
+      "password_confirmation": confirm_password,
+      "phone": phone,
+    }, headers: {
       'Authorization': 'Bearer $token',
     });
     if (response.statusCode == 200) {

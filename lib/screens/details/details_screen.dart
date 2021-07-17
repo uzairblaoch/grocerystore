@@ -38,7 +38,7 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-  static int quantity = 1;
+  int quantity = 1;
   Timer _timer;
   int selectedImage = 0;
   bool isfavourite = false;
@@ -144,7 +144,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         right: getProportionateScreenWidth(64),
                       ),
                       child: Text(
-                        arguments['description'] ?? "a",
+                        arguments['description'] ?? " ",
                         maxLines: 5,
                       ),
                     ),
@@ -160,24 +160,48 @@ class _DetailsScreenState extends State<DetailsScreen> {
                             horizontal: getProportionateScreenWidth(20)),
                         child: Row(
                           children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Align(
-                                child: Text(
-                                  quantity.toString(),
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87),
+                            Expanded(
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                child: Align(
+                                  child: Text(
+                                    "Rs. " + arguments['sale_price'] ?? "",
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.orange),
+                                  ),
                                 ),
                               ),
                             ),
-                            Text(" x Unit"),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 5),
+                                child: Container(
+                                  //width: 30,
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Align(
+                                    child: Text(
+                                      "x " + quantity.toString(),
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            //Text(" x Unit"),
                             Spacer(),
                             RoundedIconBtn(
                               icon: Icons.remove,

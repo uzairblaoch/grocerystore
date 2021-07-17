@@ -15,6 +15,15 @@ class Body extends StatefulWidget {
 
 class _BodyState extends State<Body> {
   @override
+  void initState() {
+    super.initState();
+    Utils().viewCart();
+    gettotalItems();
+  }
+
+  var image_base_url = 'http://grocerystore.codingoverflow.com/storage/';
+  int totalItems = 0;
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding:
@@ -23,17 +32,27 @@ class _BodyState extends State<Body> {
         future: Utils().viewCart(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            // print(snapshot.data.data.products.length);
+            totalItems = snapshot.data.data.products.length;
+            print(totalItems);
             return ListView.builder(
               itemCount: snapshot.data.data.products.length,
               itemBuilder: (BuildContext context, index) => Padding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: Dismissible(
-                  key: Key(snapshot.data.data.products[0].id
-                      .toString()), //demoCarts[index].product.id.toString()
+                  key:
+                      UniqueKey() /*Key(snapshot.data.data.products[index].pivot.productId
+                      .toString())*/
+                  , //demoCarts[index].product.id.toString()
                   direction: DismissDirection.endToStart,
                   onDismissed: (direction) {
                     setState(() {
-                      demoCarts.removeAt(index);
+                      print(direction);
+                      Utils().removeCart(snapshot
+                          .data.data.products[index].pivot.productId
+                          .toString());
+                      Utils().viewCart();
+                      // ViewCart.removeAt(index);
                     });
                   },
                   background: Container(
@@ -50,8 +69,9 @@ class _BodyState extends State<Body> {
                     ),
                   ),
                   child: CartCard(
-                    image:
-                        "https://miro.medium.com/max/880/0*H3jZONKqRuAAeHnG.jpg",
+                    image: image_base_url +
+                        snapshot.data.data.products[index].productGalleries[0]
+                            .productImage,
                     title: snapshot.data.data.products[index].productName,
                     price: snapshot.data.data.products[index].salePrice,
                     qty: snapshot.data.data.products[index].pivot.qty,
@@ -61,11 +81,25 @@ class _BodyState extends State<Body> {
             );
           }
           return Center(
+            child: CircularProgressIndicator(
+              valueColor: new AlwaysStoppedAnimation<Color>(Colors.orange),
+            ),
+          );
+
+          /*return Center(
             child: Text('Cart is Empty'), //CircularProgressIndicator(
             //   valueColor: new AlwaysStoppedAnimation<Color>(Colors.orange),
-          );
+          );*/
         },
       ),
     );
+  }
+
+  gettotalItems() async {
+    /* print('------------------------------------');
+    print(totalItems);
+    print('------------------------------------');
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('totalItems', totalItems);*/
   }
 }
