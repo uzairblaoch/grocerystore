@@ -5,7 +5,6 @@ import 'package:shop_app/models/GetCategories.dart';
 import 'package:shop_app/models/GetFavouriteProducts.dart';
 import 'package:shop_app/models/GetSearchProducts.dart';
 import 'package:shop_app/models/PopularProducts.dart';
-import 'package:shop_app/models/checkout.dart';
 import 'package:shop_app/models/productsByCategory.dart';
 import 'package:shop_app/models/viewCart.dart';
 
